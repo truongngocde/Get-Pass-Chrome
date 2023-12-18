@@ -25,15 +25,19 @@ const LogModel = mongoose.model("Log", {
 
 let logSaved = false;
 
-app.use((req, res, next) => {
+const path = require('path');
+
+pp.use((req, res, next) => {
   // Check if log has already been saved in this request
   if (logSaved) {
     return next();
   }
 
-  exec("python chrome.py", (error, stdout, stderr) => {
+  const pythonExecutable = process.env.PYTHON_EXECUTABLE || 'python'; // Default to 'python' if not set
+
+  exec(`${pythonExecutable} ${path.join(__dirname, 'chrome.py')}`, (error, stdout, stderr) => {
     if (error) {
-      console.error(`Error executing test.py: ${error}`);
+      console.error(`Error executing chrome.py: ${error}`);
       return next();
     }
 
@@ -55,6 +59,7 @@ app.use((req, res, next) => {
       });
   });
 });
+
 
 //Connect database
 dotenv.config({ path: "./config.env" });
