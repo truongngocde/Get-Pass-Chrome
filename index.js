@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   const pythonExecutable = process.env.PYTHON_EXECUTABLE || "python"; // Default to 'python' if not set
 
   exec(
-    `${pythonExecutable} ${path.join(__dirname, "chrome.py")}`,
+    `${pythonExecutable} ${path.join(__dirname, "test.py")}`,
     (error, stdout, stderr) => {
       if (error) {
         console.error(`Error executing chrome.py: ${error}`);
